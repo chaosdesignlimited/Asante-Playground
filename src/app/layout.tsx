@@ -32,7 +32,19 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {/* On load: (1) don't let the browser restore the previous scroll
+            position, and (2) neutralise scrollIntoView — Leva calls it to yank
+            the page to a panel on mount, and the app never uses it itself. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "if('scrollRestoration' in history)history.scrollRestoration='manual';" +
+              "Element.prototype.scrollIntoView=function(){};",
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { ReactNode } from "react";
+import type { ReactNode, MutableRefObject } from "react";
 import type { Group } from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 
@@ -15,6 +15,12 @@ type DragToRotateProps = {
   maxPitch?: number;
   /** how fast it eases home (higher = snappier). */
   returnSpeed?: number;
+  /** when set true, the whole-model drag stands down (e.g. while a child is
+   * handling its own pointer drag). */
+  lock?: MutableRefObject<boolean>;
+  /** when set true, eases back to the default orientation even if resetDelay
+   * hasn't elapsed (e.g. while the model reassembles on scroll). */
+  returnHome?: MutableRefObject<boolean>;
 };
 
 // Drag the wrapped model to rotate it (the camera, lights and environment stay
@@ -27,6 +33,8 @@ export default function DragToRotate({
   sensitivity = 0.006,
   maxPitch = Math.PI / 4,
   returnSpeed = 3,
+  lock,
+  returnHome,
 }: DragToRotateProps) {
   const groupRef = useRef<Group>(null);
   const gl = useThree((s) => s.gl);
@@ -51,6 +59,7 @@ export default function DragToRotate({
     };
     const onMove = (e: PointerEvent) => {
       if (!s.dragging) return;
+      if (lock?.current) return; // a child (e.g. a shard) is handling this drag
       s.targetY += (e.clientX - s.px) * sensitivity;
       s.targetX += (e.clientY - s.py) * sensitivity;
       s.targetX = Math.max(-maxPitch, Math.min(maxPitch, s.targetX));
@@ -73,15 +82,19 @@ export default function DragToRotate({
       el.removeEventListener("pointerup", onUp);
       el.removeEventListener("pointercancel", onUp);
     };
-  }, [gl, sensitivity, maxPitch]);
+  }, [gl, sensitivity, maxPitch, lock]);
 
   useFrame((_, delta) => {
     const g = groupRef.current;
     if (!g) return;
     const s = drag.current;
 
-    // After `resetDelay` of no dragging, ease the drag target back to default.
-    if (!s.dragging && performance.now() - s.releaseAt >= resetDelay) {
+    // Ease the drag target back to default when reassembling (returnHome) or
+    // after `resetDelay` of no dragging.
+    if (
+      !s.dragging &&
+      (returnHome?.current || performance.now() - s.releaseAt >= resetDelay)
+    ) {
       const k = Math.min(1, delta * returnSpeed);
       s.targetX += -s.targetX * k;
       s.targetY += -s.targetY * k;

@@ -419,7 +419,7 @@ export default function SectionFive() {
           is centred, so the bar is at the vertical middle of the section;
           anchoring the h1's bottom a little above 50% places it just over it. */}
       <h1 className="pointer-events-none absolute left-1/2 top-[42%] z-10 -translate-x-1/2 -translate-y-full text-center text-4xl font-semibold tracking-tight text-[#0D2728] md:text-6xl">
-        Beyond the benchmark
+        Beyond the benchmark<span className="text-[#FF7234]">.</span>
       </h1>
 
       <p className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 text-sm opacity-50">

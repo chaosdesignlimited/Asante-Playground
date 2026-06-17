@@ -272,8 +272,8 @@ export default function SectionFive() {
     {
       radius: { value: 1, min: 0.3, max: 2, step: 0.05 },
       hole: { value: 0.55, min: 0, max: 0.9, step: 0.01 },
-      depth: { value: 0.3, min: 0.01, max: 5, step: 0.01 },
-      bevel: { value: 0.05, min: 0, max: 0.3, step: 0.01 },
+      depth: { value: 0.45, min: 0.01, max: 5, step: 0.01 },
+      bevel: { value: 0.02, min: 0, max: 0.3, step: 0.01 },
       spin: { value: 0, min: 0, max: 2, step: 0.05 },
     },
     { store }
@@ -414,6 +414,13 @@ export default function SectionFive() {
           />
         </Suspense>
       </Canvas>
+
+      {/* Title sits just above where the bar rests before it morphs. The model
+          is centred, so the bar is at the vertical middle of the section;
+          anchoring the h1's bottom a little above 50% places it just over it. */}
+      <h1 className="pointer-events-none absolute left-1/2 top-[42%] z-10 -translate-x-1/2 -translate-y-full text-center text-4xl font-semibold tracking-tight text-[#0D2728] md:text-6xl">
+        Beyond the benchmark
+      </h1>
 
       <p className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 text-sm opacity-50">
         Drag to rotate · tune the shape in the panel →

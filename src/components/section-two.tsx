@@ -9,7 +9,6 @@ import {
   Bounds,
   Environment,
   ContactShadows,
-  MeshTransmissionMaterial,
   useGLTF,
 } from "@react-three/drei";
 
@@ -58,20 +57,17 @@ function GlassBlock() {
   return (
     <Bounds fit clip observe margin={2}>
       <group>
-        {/* Outer glass shell — clear and see-through, but with real reflections
-            and refraction so the surface reads as actual glass. */}
+        {/* Model shell — solid orange with a glossy clearcoat. Low roughness +
+            clearcoat give it sharp reflections so the scene lighting/environment
+            visibly catches the surface, but it stays opaque (no transmission),
+            so it reads as a polished solid rather than see-through glass. */}
         <mesh geometry={geometry}>
-          <MeshTransmissionMaterial
-            transmission={1}
-            thickness={0.02}
-            roughness={0}
-            ior={1.25}
-            chromaticAberration={0.01}
-            anisotropy={0.1}
-            distortion={0}
-            temporalDistortion={0}
-            samples={8}
-            color="#ffffff"
+          <meshPhysicalMaterial
+            color="#FF7234"
+            roughness={0.15}
+            metalness={0}
+            clearcoat={1}
+            clearcoatRoughness={0.1}
           />
         </mesh>
 

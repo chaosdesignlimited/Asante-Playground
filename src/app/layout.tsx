@@ -33,6 +33,13 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        {/* Adobe Fonts (Typekit) kit "ale2evc" — provides IvyJournal. React 19
+            hoists this stylesheet into <head>. */}
+        <link
+          rel="stylesheet"
+          href="https://use.typekit.net/ale2evc.css"
+          precedence="default"
+        />
         {/* On load: (1) don't let the browser restore the previous scroll
             position, and (2) neutralise scrollIntoView — Leva calls it to yank
             the page to a panel on mount, and the app never uses it itself. */}

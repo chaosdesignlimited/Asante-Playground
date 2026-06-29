@@ -2,6 +2,10 @@ import Link from "next/link";
 
 const sections = [
   {
+    href: "/compass-pattern",
+    label: "A grid of arrows that point toward your cursor like compass needles",
+  },
+  {
     href: "/section-seven",
     label: "Clear glass bar that splits, swirls into a ring, and grows as you scroll",
   },
@@ -13,26 +17,22 @@ const sections = [
     href: "/line-grid",
     label: "A grid of little lines that turn to follow your cursor",
   },
-  {
-    href: "/compass-pattern",
-    label: "A grid of arrows that point toward your cursor like compass needles",
-  },
-  {
-    href: "/section-five",
-    label: "Frosted glass bar morphing into a hollow ring",
-  },
-  {
-    href: "/section-four",
-    label: "Orange glass blocks tumbling down into a stack",
-  },
+  // {
+  //   href: "/section-five",
+  //   label: "Frosted glass bar morphing into a hollow ring",
+  // },
+  // {
+  //   href: "/section-four",
+  //   label: "Orange glass blocks tumbling down into a stack",
+  // },
   {
     href: "/section-three",
     label: "Orange glass slabs rippling in a wave",
   },
-  {
-    href: "/section-two",
-    label: "Orange glass block filled with liquid, slowly rotating",
-  },
+  // {
+  //   href: "/section-two",
+  //   label: "Orange glass block filled with liquid, slowly rotating",
+  // },
 ];
 
 export default function Home() {

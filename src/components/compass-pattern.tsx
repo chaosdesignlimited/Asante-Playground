@@ -313,7 +313,7 @@ export default function CompassPattern() {
           className="px-6 text-center font-ivy font-light leading-[1.1] tracking-tight text-[#F8F6F3] opacity-0"
           style={{ fontSize: "clamp(2.5rem, 9vw, 7rem)" }}
         >
-          Beyond the bench.
+          Beyond the benchmark.
         </h1>
       </div>
       <button

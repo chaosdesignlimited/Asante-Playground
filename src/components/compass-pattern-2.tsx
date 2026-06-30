@@ -9,10 +9,10 @@ const ARROW_RATIO = 184.65 / 196.77; // width / height from the SVG viewBox
 const DEFAULT_OPACITY = 0.175; // resting alpha of the background grid
 
 // Centre emblem: a white-bordered circle with a big white arrow (6× grid arrow).
-const BIG_ICON_SCALE = 6;
+const BIG_ICON_SCALE = 4.8; // 20% smaller (was 6× the grid arrow)
 const BIG_ICON_H = ICON_SIZE * BIG_ICON_SCALE;
 const BIG_ICON_W = BIG_ICON_H * ARROW_RATIO;
-const CIRCLE_D = BIG_ICON_H * 2;
+const CIRCLE_D = ICON_SIZE * 12; // ring diameter — kept fixed as the arrow shrank
 
 // The ring is split into 4 quarter arcs with small gaps at the cardinal points
 // (a cross); a quarter fades to orange when the arrow tip points into it.
@@ -216,7 +216,7 @@ export default function CompassPatternTwo() {
             style={{
               width: BIG_ICON_W,
               height: BIG_ICON_H,
-              backgroundColor: "#ffffff",
+              backgroundColor: "#e85a1c",
               WebkitMaskImage: "url(/arrow-icon.svg)",
               maskImage: "url(/arrow-icon.svg)",
               WebkitMaskSize: "contain",

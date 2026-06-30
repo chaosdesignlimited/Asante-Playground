@@ -13,18 +13,18 @@ const sections = [
     href: "/compass-pattern-2",
     label: "A big arrow that spins to your cursor; the ring quarter it points at lights orange",
   },
-  {
-    href: "/section-seven",
-    label: "Clear glass bar that splits, swirls into a ring, and grows as you scroll",
-  },
-  {
-    href: "/section-six",
-    label: "Frosted glass ring with segments you can grab and spin",
-  },
-  {
-    href: "/line-grid",
-    label: "A grid of little lines that turn to follow your cursor",
-  },
+  // {
+  //   href: "/section-seven",
+  //   label: "Clear glass bar that splits, swirls into a ring, and grows as you scroll",
+  // },
+  // {
+  //   href: "/section-six",
+  //   label: "Frosted glass ring with segments you can grab and spin",
+  // },
+  // {
+  //   href: "/line-grid",
+  //   label: "A grid of little lines that turn to follow your cursor",
+  // },
   // {
   //   href: "/section-five",
   //   label: "Frosted glass bar morphing into a hollow ring",
@@ -33,10 +33,10 @@ const sections = [
   //   href: "/section-four",
   //   label: "Orange glass blocks tumbling down into a stack",
   // },
-  {
-    href: "/section-three",
-    label: "Orange glass slabs rippling in a wave",
-  },
+  // {
+  //   href: "/section-three",
+  //   label: "Orange glass slabs rippling in a wave",
+  // },
   // {
   //   href: "/section-two",
   //   label: "Orange glass block filled with liquid, slowly rotating",

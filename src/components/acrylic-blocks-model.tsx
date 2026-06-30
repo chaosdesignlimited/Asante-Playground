@@ -20,7 +20,6 @@ const SLABS = ["Slab_1", "Slab_2", "Slab_3", "Slab_4"];
 type Tunables = {
   thickness: number;
   roughness: number;
-  clearcoat: number;
   attenuationColor: string;
   attenuationDistance: number;
   envMapIntensity: number;
@@ -49,8 +48,6 @@ function Blocks({ tune }: { tune: Tunables }) {
               transmission={1}
               ior={1.45}
               roughness={tune.roughness}
-              clearcoat={tune.clearcoat}
-              clearcoatRoughness={0.04}
               thickness={tune.thickness}
               color="#F58A3C"
               attenuationColor={tune.attenuationColor}
@@ -77,22 +74,19 @@ export default function AcrylicBlocksModel() {
     {
       // Lower thickness = less absorbed per slab → lighter / more see-through.
       thickness: { value: 0.1, min: 0, max: 3, step: 0.05 },
-      // Higher = hard reflections scatter into a soft sheen, not mirror streaks.
-      roughness: { value: 0.06, min: 0, max: 1, step: 0.01 },
-      // Crisp glassy surface coat on top of the (slightly rough) base.
-      clearcoat: { value: 1, min: 0, max: 1, step: 0.01 },
-      // Warm amber-orange (away from red).
-      attenuationColor: "#F2A24B",
-      // High so light survives the thick centre and stays orange; lower slowly
-      // if you want the overlaps deeper, but stop before the centre goes dark.
-      attenuationDistance: { value: 20, min: 0.1, max: 40, step: 0.1 },
-      envMapIntensity: { value: 0.8, min: 0, max: 3, step: 0.1 },
+      // Lower = glossier, sharper reflections.
+      roughness: { value: 0.03, min: 0, max: 1, step: 0.01 },
+      // Brighter orange so deep overlap paths stay orange instead of browning.
+      attenuationColor: "#F7913A",
+      // High so light survives the thick centre / overlaps and stays orange.
+      attenuationDistance: { value: 35, min: 0.1, max: 40, step: 0.1 },
+      envMapIntensity: { value: 1.4, min: 0, max: 3, step: 0.1 },
       // Softer, more even environment that glows rather than glares.
       preset: {
         value: "apartment",
         options: ["apartment", "city", "studio", "warehouse", "lobby", "park"],
       },
-      environmentIntensity: { value: 0.8, min: 0, max: 3, step: 0.1 },
+      environmentIntensity: { value: 1.0, min: 0, max: 3, step: 0.1 },
     },
     { store }
   );
@@ -123,7 +117,7 @@ export default function AcrylicBlocksModel() {
 
         <Suspense fallback={null}>
           {/* Auto-frame, then a default 3/4 pose (long axis up-right); drag works. */}
-          <Bounds fit clip margin={1.2}>
+          <Bounds fit clip margin={1.09}>
             <DragToRotate resetDelay={1500}>
               <group rotation={[0.5, 0.7, 0]}>
                 <Blocks tune={tune} />

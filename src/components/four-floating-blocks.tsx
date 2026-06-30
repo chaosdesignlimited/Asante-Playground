@@ -9,11 +9,7 @@ import {
   mergeGeometries,
 } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { Canvas, useFrame } from "@react-three/fiber";
-import {
-  Environment,
-  MeshTransmissionMaterial,
-  MeshReflectorMaterial,
-} from "@react-three/drei";
+import { Environment, MeshTransmissionMaterial } from "@react-three/drei";
 import {
   LevaPanel,
   useControls,
@@ -184,12 +180,20 @@ function buildHollowBlock(
 const DEG = Math.PI / 180;
 const LAYERS = [0, 1, 2, 3];
 
+// Press-and-hold: gaps compress smoothly while held, then spring back with
+// elasticity on release before settling into the breathing.
+const PRESS_STIFFNESS = 170;
+const PRESS_DAMP_IN = 26; // ~critically damped → smooth compress, no bounce in
+const PRESS_DAMP_OUT = 9; // underdamped → elastic spring-back on release
+const PRESS_COMPRESS = 0.8; // fraction of the gap that closes when fully pressed
+
 function Bar({
   glass,
   bar,
   stack,
   rotation,
   float,
+  pressRef,
   runId,
 }: {
   glass: GlassProps;
@@ -197,6 +201,7 @@ function Bar({
   stack: StackParams;
   rotation: { rotateX: number; rotateY: number; rotateZ: number };
   float: FloatParams;
+  pressRef: { current: boolean };
   runId: number;
 }) {
   const introRef = useRef<Group>(null);
@@ -204,7 +209,13 @@ function Bar({
   const meshRefs = useRef<(Mesh | null)[]>([]);
   const geoRef = useRef<BufferGeometry | null>(null);
   const barGeoRef = useRef<BufferGeometry | null>(null);
-  const anim = useRef({ startedAt: -1, sig: "", barSig: "" });
+  const anim = useRef({
+    startedAt: -1,
+    sig: "",
+    barSig: "",
+    press: 0, // eased compression amount (0 = default, 1 = fully pressed)
+    pressVel: 0, // spring velocity
+  });
 
   useEffect(() => {
     if (runId > 0) anim.current.startedAt = -1;
@@ -218,7 +229,7 @@ function Bar({
     []
   );
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const a = anim.current;
     if (runId > 0 && a.startedAt < 0) a.startedAt = state.clock.elapsedTime;
 
@@ -295,18 +306,28 @@ function Bar({
       a.sig = sig;
     }
 
+    // Press-and-hold spring driving the gap compression. Critically damped while
+    // held (smooth compress, no bounce); underdamped on release (elastic
+    // spring-back that overshoots and settles).
+    const dt = Math.min(delta, 1 / 30);
+    const pressTarget = pressRef.current ? 1 : 0;
+    const damp = pressTarget === 1 ? PRESS_DAMP_IN : PRESS_DAMP_OUT;
+    a.pressVel +=
+      ((pressTarget - a.press) * PRESS_STIFFNESS - a.pressVel * damp) * dt;
+    a.press += a.pressVel * dt;
+
     // Very subtle "breathing": the spacing oscillates a touch so the gaps grow
-    // and shrink together. No floaty drift — just the gaps.
+    // and shrink together. Pressing closes the gaps on top of that.
     const t = state.clock.elapsedTime;
     const breathe = float.floating
       ? Math.sin(t * float.speed) * float.amplitude
       : 0;
-    const breatheSpacing = spacing + breathe;
+    const effSpacing = spacing - stack.gap * PRESS_COMPRESS * a.press + breathe;
     for (let layer = 0; layer < 4; layer++) {
       const m = meshRefs.current[layer];
       if (!m) continue;
       m.visible = splitting;
-      m.position.set(0, 0, (layer - 1.5) * breatheSpacing);
+      m.position.set(0, 0, (layer - 1.5) * effSpacing);
     }
   });
 
@@ -350,6 +371,27 @@ export default function FourFloatingBlocks() {
   const store = useCreateStore();
   const [runId, setRunId] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
+  // True while the left mouse button is held down in the section — read by the
+  // Bar's spring loop to compress the gaps.
+  const pressRef = useRef(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const down = (e: MouseEvent) => {
+      if (e.button === 0) pressRef.current = true;
+    };
+    const up = () => {
+      pressRef.current = false;
+    };
+    el.addEventListener("mousedown", down);
+    // Release on window so it still fires if the cursor leaves the section.
+    window.addEventListener("mouseup", up);
+    return () => {
+      el.removeEventListener("mousedown", down);
+      window.removeEventListener("mouseup", up);
+    };
+  }, []);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -401,8 +443,8 @@ export default function FourFloatingBlocks() {
   const rotation = useControls(
     "Rotation",
     {
-      rotateX: { value: 34, min: -180, max: 180, step: 1 },
-      rotateY: { value: 28, min: -180, max: 180, step: 1 },
+      rotateX: { value: 16, min: -180, max: 180, step: 1 },
+      rotateY: { value: 41, min: -180, max: 180, step: 1 },
       rotateZ: { value: 0, min: -180, max: 180, step: 1 },
     },
     { store }
@@ -413,7 +455,7 @@ export default function FourFloatingBlocks() {
     {
       floating: true,
       // How much the gaps breathe (scene units). Keep tiny — just a hint.
-      amplitude: { value: 0.007, min: 0, max: 0.1, step: 0.001 },
+      amplitude: { value: 0.013, min: 0, max: 0.1, step: 0.001 },
       speed: { value: 0.4, min: 0, max: 2, step: 0.05 },
     },
     { store }
@@ -515,7 +557,7 @@ export default function FourFloatingBlocks() {
       // Rotating the environment is the real "lighting angle" for glass — the
       // transmission material is lit by the env map, not the direct light.
       // Front/top key for bright, clean studio highlights.
-      envRotX: { value: 15, min: -180, max: 180, step: 1 },
+      envRotX: { value: 50, min: -180, max: 180, step: 1 },
       envRotY: { value: 25, min: -180, max: 180, step: 1 },
       envRotZ: { value: 0, min: -180, max: 180, step: 1 },
       background: "#F2F2F3",
@@ -561,6 +603,7 @@ export default function FourFloatingBlocks() {
               stack={stack}
               rotation={rotation}
               float={float}
+              pressRef={pressRef}
               runId={runId}
             />
           </DragToRotate>
@@ -569,22 +612,6 @@ export default function FourFloatingBlocks() {
             environmentIntensity={environmentIntensity}
             environmentRotation={[envRotX * DEG, envRotY * DEG, envRotZ * DEG]}
           />
-
-          {/* Glossy studio floor — gives the soft reflection under the glass.
-              Nudge position-y to sit it just below the bottom slab. */}
-          <mesh rotation-x={-Math.PI / 2} position={[0, -1.1, 0]}>
-            <planeGeometry args={[50, 50]} />
-            <MeshReflectorMaterial
-              resolution={512}
-              blur={[300, 300]}
-              mixBlur={1}
-              mixStrength={3}
-              roughness={0.9}
-              depthScale={1}
-              color={background}
-              metalness={0}
-            />
-          </mesh>
         </Suspense>
       </Canvas>
 

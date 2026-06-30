@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(OUT=/Users/rob.w/Sites/Asante-Playground/public/model/model.glb /Applications/Blender.app/Contents/MacOS/Blender --background --python scripts/build_blocks.py)",
+      "Bash(node -e ' *)"
+    ]
+  }
+}

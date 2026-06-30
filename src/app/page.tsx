@@ -2,8 +2,16 @@ import Link from "next/link";
 
 const sections = [
   {
+    href: "/four-floating-blocks",
+    label: "Four floating glass blocks (based on section seven)",
+  },
+  {
     href: "/compass-pattern",
     label: "A grid of arrows that point toward your cursor like compass needles",
+  },
+  {
+    href: "/compass-pattern-2",
+    label: "A big arrow that spins to your cursor; the ring quarter it points at lights orange",
   },
   {
     href: "/section-seven",
